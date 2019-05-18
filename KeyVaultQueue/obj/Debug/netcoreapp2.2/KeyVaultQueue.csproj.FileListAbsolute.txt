@@ -1,0 +1,6 @@
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\bin\Debug\netcoreapp2.2\KeyVaultQueue.deps.json
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\bin\Debug\netcoreapp2.2\KeyVaultQueue.dll
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\obj\Debug\netcoreapp2.2\KeyVaultQueue.csprojAssemblyReference.cache
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\obj\Debug\netcoreapp2.2\KeyVaultQueue.csproj.CoreCompileInputs.cache
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\obj\Debug\netcoreapp2.2\KeyVaultQueue.AssemblyInfoInputs.cache
+C:\Users\jonat\repos\KeyVaultExample\KeyVaultQueue\obj\Debug\netcoreapp2.2\KeyVaultQueue.AssemblyInfo.cs

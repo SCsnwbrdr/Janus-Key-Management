@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/KeyVaultExample/v15
+/.vs/config
+/KeyVaultExample/bin/Debug/netcoreapp2.2
+/KeyVaultExample/obj
+/KeyVaultExample.Service/bin/Debug/netcoreapp2.2
+/KeyVaultExample.Service/obj
