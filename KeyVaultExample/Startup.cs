@@ -1,4 +1,5 @@
 ﻿using KeyVaultExample.Service;
+using KeyVaultQueue;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,8 @@ namespace KeyVaultExample
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             services.AddSingleton<MemoryService>();
-            services.AddSingleton<AzureServiceBusService>();
+            services.AddScoped<AzureServiceBusService>();
+            services.AddSingleton<KeyVaultMessageQueue>(new KeyVaultMessageQueue())
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
