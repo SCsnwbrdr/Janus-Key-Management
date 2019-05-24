@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 
 namespace KeyVaultExample
 {
@@ -21,10 +22,13 @@ namespace KeyVaultExample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            var arrayOfUrls = Configuration.GetSection("AzureMessageQueue:KeyVault:KeyVaultUrls").Get<string[]>();
             services.AddSingleton<MemoryService>();
             services.AddScoped<AzureServiceBusService>();
-            services.AddSingleton<KeyVaultMessageQueue>(new KeyVaultMessageQueue())
+            services.AddSingleton<KeyVaultMessageQueue>(new KeyVaultMessageQueue(Configuration.GetValue<string>("AzureMessageQueue:KeyVault:EndPoint"),
+                Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueName"),
+                Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueAccessKeyName"), arrayOfUrls
+                ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

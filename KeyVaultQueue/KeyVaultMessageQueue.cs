@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace KeyVaultQueue
 {
-    public class KeyVaultMessageQueue
+    public class KeyVaultMessageQueue: IDisposable
     {
         
 
@@ -20,8 +20,10 @@ namespace KeyVaultQueue
         private string _queueName;
         private List<KeyToken> _tokens = new List<KeyToken>();
         private string _activeUrl;
+        QueueClient sendQueueClient;
+        QueueClient receiveQueueClient;
 
-        public KeyVaultMessageQueue(string endpoint, string queueName, string queueAccessKeyName, List<string> keyVaultUrls)
+        public KeyVaultMessageQueue(string endpoint, string queueName, string queueAccessKeyName, IEnumerable<string> keyVaultUrls)
         {
             _endpoint = endpoint;
             _sharedAccessKeyName = queueAccessKeyName;
@@ -31,6 +33,7 @@ namespace KeyVaultQueue
                 var secretBundle = FetchKeyVault(url).Result;
                 _tokens.Add(new KeyToken()
                 {
+                    Identifier = url,
                     IsPrimary = _tokens.Count == 0,
                     Token = secretBundle.Value
                 });
@@ -46,28 +49,63 @@ namespace KeyVaultQueue
 
         public async Task SendString(string rawMessage)
         {
-            var queueClient = new QueueClient(ServiceBusConnectionString(), _queueName);
+            try
+            {
+                await PostMessage(rawMessage);
+            }
+            catch (UnauthorizedException)
+            {
+                await sendQueueClient.CloseAsync();
+                var badToken = _tokens.Find(item => item.IsPrimary);
+                var keyToken = _tokens.Find(item => !item.DeadToken && !item.IsPrimary);
+                badToken.IsPrimary = false;
+                badToken.DeadToken = true;
+                if (keyToken == null) throw;
+                keyToken.IsPrimary = true;
+                await SendString(rawMessage);
+                var secretBundle = FetchKeyVault(badToken.Identifier).Result;
+                badToken.Token = secretBundle.Value;
+                badToken.DeadToken = false;
+            }
+        }
+
+        private async Task PostMessage(string rawMessage)
+        {
+            sendQueueClient = new QueueClient(ServiceBusConnectionString(), _queueName);
             var message = new Message(Encoding.UTF8.GetBytes(rawMessage));
-            await queueClient.SendAsync(message);
-            await queueClient.CloseAsync();
+            await sendQueueClient.SendAsync(message);
         }
 
-        public async Task ReadFromQueue(Func<Message,CancellationToken,Task> handler, MessageHandlerOptions options)
+
+        public void ReadFromQueue(Func<Message,CancellationToken,Task> handler, MessageHandlerOptions options)
         {
-            var queueClient = new QueueClient(ServiceBusConnectionString(), _queueName);
-            SetupAndFetchMessages(queueClient, handler, options);
-            await queueClient.CloseAsync();
+            receiveQueueClient = new QueueClient(ServiceBusConnectionString(), _queueName);
+            receiveQueueClient.RegisterMessageHandler(handler, options);
         }
 
-        private void SetupAndFetchMessages(QueueClient client, Func<Message, CancellationToken, Task> handler, MessageHandlerOptions options)
+        public async Task CompleteAsync(string token)
         {
-            client.RegisterMessageHandler(handler, options);
+           await receiveQueueClient.CompleteAsync(token);
         }
+
+
         private string ServiceBusConnectionString()
         {
             var activeToken = _tokens.Find(item => item.IsPrimary);
             if (activeToken == null) throw new NullReferenceException("There are no keys listed as a the primary key, either no keys were passed or all keys failed.");
             return string.Format(ServiceBusConnectionStringFormat, _endpoint, _sharedAccessKeyName, activeToken.Token);
+        }
+
+        public void Dispose()
+        {
+            if (!receiveQueueClient.IsClosedOrClosing)
+            {
+                receiveQueueClient.CloseAsync();
+            }
+            if (!sendQueueClient.IsClosedOrClosing)
+            {
+                sendQueueClient.CloseAsync();
+            }
         }
     }
 }

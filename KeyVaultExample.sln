@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVaultExample", "KeyVault
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVaultExample.Service", "KeyVaultExample.Service\KeyVaultExample.Service.csproj", "{A9279FA5-EB72-43DC-8701-A7622C06CAB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyVaultQueue", "KeyVaultQueue\KeyVaultQueue.csproj", "{DB8AC43B-398C-42EA-98DF-C6A333CF9362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVaultQueue", "KeyVaultQueue\KeyVaultQueue.csproj", "{DB8AC43B-398C-42EA-98DF-C6A333CF9362}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzurePowershell", "AzurePowershell", "{D2A299C3-FB7A-4B4B-9638-9F6DF924A40A}"
+	ProjectSection(SolutionItems) = preProject
+		RotateKeys.txt = RotateKeys.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
