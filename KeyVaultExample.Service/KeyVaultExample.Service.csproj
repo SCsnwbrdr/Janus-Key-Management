@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\KeyVaultQueue\KeyVaultQueue.csproj" />
+    <ProjectReference Include="..\JanusKeyManagement\JanusKeyManagement.csproj" />
   </ItemGroup>
 
 </Project>

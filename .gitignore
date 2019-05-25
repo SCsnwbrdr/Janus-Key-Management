@@ -8,3 +8,5 @@
 /KeyVaultExample/obj
 /KeyVaultExample.Service/bin/Debug/netcoreapp2.2
 /KeyVaultExample.Service/obj
+/JanusKeyManagement/bin/Debug/netcoreapp2.2
+/JanusKeyManagement/obj
