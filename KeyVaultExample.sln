@@ -9,10 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVaultExample.Service", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzurePowershell", "AzurePowershell", "{D2A299C3-FB7A-4B4B-9638-9F6DF924A40A}"
 	ProjectSection(SolutionItems) = preProject
-		RotateKeys.txt = RotateKeys.txt
+		RotateKeys.ps1 = RotateKeys.ps1
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JanusKeyManagement", "JanusKeyManagement\JanusKeyManagement.csproj", "{23E21591-5B4C-4392-B4E8-A2A6B5CF8DB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JanusKeyManagement", "JanusKeyManagement\JanusKeyManagement.csproj", "{23E21591-5B4C-4392-B4E8-A2A6B5CF8DB2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KeyVaultExample.Repository", "KeyVaultExample.Model\KeyVaultExample.Repository.csproj", "{8BC5C790-64D2-4E1D-B769-65F242F12873}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyVaultExample.UOW", "KeyVaultExample.UOW\KeyVaultExample.UOW.csproj", "{7E7DE28C-1D75-4782-8957-02422AE04295}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +36,14 @@ Global
 		{23E21591-5B4C-4392-B4E8-A2A6B5CF8DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23E21591-5B4C-4392-B4E8-A2A6B5CF8DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23E21591-5B4C-4392-B4E8-A2A6B5CF8DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BC5C790-64D2-4E1D-B769-65F242F12873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BC5C790-64D2-4E1D-B769-65F242F12873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BC5C790-64D2-4E1D-B769-65F242F12873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BC5C790-64D2-4E1D-B769-65F242F12873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E7DE28C-1D75-4782-8957-02422AE04295}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E7DE28C-1D75-4782-8957-02422AE04295}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E7DE28C-1D75-4782-8957-02422AE04295}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E7DE28C-1D75-4782-8957-02422AE04295}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

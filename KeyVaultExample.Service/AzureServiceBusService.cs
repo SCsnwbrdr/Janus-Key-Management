@@ -12,9 +12,9 @@ namespace KeyVaultExample.Service
         private readonly MemoryService _memoryService;
         private readonly IJanusKeyEngine _janusKeyEngine;
         const string ServiceBusConnectionStringFormat = "Endpoint={0};SharedAccessKeyName={1};SharedAccessKey={2}";
-        private string _endpoint;
-        private string _sharedAccessKeyName;
-        private string _queueName;
+        private readonly string _endpoint;
+        private readonly string _sharedAccessKeyName;
+        private readonly string _queueName;
         private QueueClient sendQueueClient;
         private QueueClient receiveQueueClient;
 

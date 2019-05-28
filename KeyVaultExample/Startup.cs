@@ -25,11 +25,10 @@ namespace KeyVaultExample
             IServiceProvider provider = services.BuildServiceProvider();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            var arrayOfUrls = Configuration.GetSection("AzureMessageQueue:KeyVault:KeyVaultUrls").Get<string[]>();
-            var janusConfigSection = Configuration.GetSection("JanusKeyEngine").Get<Dictionary<string, string[]>>();
-
+           var janusConfigSection = Configuration.GetSection("JanusKeyEngine:Tokens").Get<Dictionary<string, string[]>>();
+            var janusCredConfigSection = Configuration.GetSection("JanusKeyEngine:Credentials").Get<Dictionary<string, JanusCredentials[]>>();
             services.AddSingleton<MemoryService>();
-            services.AddSingleton<IJanusKeyEngine>(new JanusAzureKeyEngine(janusConfigSection));
+            services.AddSingleton<IJanusKeyEngine>(new JanusAzureKeyEngine(janusConfigSection,janusCredConfigSection));
             services.AddSingleton<IAzureServiceBusService>(sp => new AzureServiceBusService(sp.GetService<MemoryService>(), Configuration.GetValue<string>("AzureMessageQueue:KeyVault:EndPoint"),
                 Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueName"),
                 Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueAccessKeyName"), sp.GetService<IJanusKeyEngine>()));

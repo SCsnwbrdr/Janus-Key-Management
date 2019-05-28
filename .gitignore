@@ -10,3 +10,5 @@
 /KeyVaultExample.Service/obj
 /JanusKeyManagement/bin/Debug/netcoreapp2.2
 /JanusKeyManagement/obj
+/KeyVaultExample.Model/obj
+/KeyVaultExample.UOW/obj
