@@ -12,6 +12,9 @@
     <Reference Include="Microsoft.Azure.Services.AppAuthentication">
       <HintPath>..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.azure.services.appauthentication\1.0.1\lib\netstandard1.4\Microsoft.Azure.Services.AppAuthentication.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore">
+      <HintPath>..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.entityframeworkcore\2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

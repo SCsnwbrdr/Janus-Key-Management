@@ -38,12 +38,6 @@ namespace KeyVaultExample.UOW
             repositories.Add(typeof(T), repo);
             return repo;
         }
-        //Todo: Kill All Repositories with the reference
-        //Todo: Pop the context in the object out of the collection
-        //Todo: Create a new Context from the Context Factory, context factory should use a string with a replace function
-        //Todo: Replace in SQL Connection String for the default Janus settings
-        //Todo: Add delegate in Generic Repositories to capture "Gets" that fail
-        
-        public void RepositoryFailover
+
     }
 }

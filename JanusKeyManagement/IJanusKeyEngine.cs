@@ -9,6 +9,9 @@ namespace JanusKeyManagement
         KeyToken ActiveCredential { get; }
 
         Task RefreshDeadTokens();
+
+        Task RefreshDeadCredentials();
         void RotateToken();
+        void RotateCredential();
     }
 }

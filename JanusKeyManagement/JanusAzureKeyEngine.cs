@@ -14,12 +14,12 @@ namespace JanusKeyManagement
         private const string NoKeyErrorMessage = "There are no keys listed as a the primary key, either no keys were passed or all keys failed.";
         private const string NoClassErrorMessage = "No matching service type was found. Ensure that the service referenced in the JanusKeyEngine section of the app config has a value matching '{0}'";
         private Dictionary<string, List<KeyToken>> _typeToTokenDictionary;
-        private Dictionary<string, Dictionary<string, KeyToken>> _typeToCredentialDictionary;
+        private Dictionary<string, List<KeyToken>> _typeToCredentialDictionary;
 
         public JanusAzureKeyEngine(Dictionary<string, string[]> Tokens, Dictionary<string, JanusCredentials[]> Credentials)
         {
             _typeToTokenDictionary = new Dictionary<string, List<KeyToken>>();
-            _typeToCredentialDictionary = new Dictionary<string, Dictionary<string, KeyToken>>();
+            _typeToCredentialDictionary = new Dictionary<string, List<KeyToken>>();
             CreateTokenDictionary(Tokens);
             CreateCredentialDictionary(Credentials);
         }
@@ -28,11 +28,11 @@ namespace JanusKeyManagement
         {
             foreach (var service in Credentials)
             {
-                var credentials = new Dictionary<string, KeyToken>();
+                var credentials = new List<KeyToken>();
                 foreach (var item in service.Value)
                 {
                     var secretBundle = FetchKeyVault(item.KeyVault).Result;
-                    credentials.Add(item.UserName, new KeyToken()
+                    credentials.Add(new KeyToken()
                     {
                         Identifier = item.UserName,
                         IsPrimary = credentials.Count == 0,
@@ -76,13 +76,13 @@ namespace JanusKeyManagement
         {
             get
             {
-                var activeToken = CredentialSet.FirstOrDefault(item => item.Value.IsPrimary);
-                if (activeToken.Value == null || activeToken.Key == null) { throw new NullReferenceException(NoKeyErrorMessage); }
-                return activeToken.Value;
+                var activeToken = CredentialSet.FirstOrDefault(item => item.IsPrimary);
+                if (activeToken == null) { throw new NullReferenceException(NoKeyErrorMessage); }
+                return activeToken;
             }
         }
 
-        private Dictionary<string, KeyToken> CredentialSet
+        private List<KeyToken> CredentialSet
         {
             get
             {
@@ -104,6 +104,15 @@ namespace JanusKeyManagement
             }
         }
 
+        public void RotateCredential()
+        {
+            var badCredential = CredentialSet.First(item => item.IsPrimary);
+            var keyCredential = CredentialSet.Find(item => !item.DeadToken && !item.IsPrimary);
+            badCredential.IsPrimary = false;
+            badCredential.DeadToken = true;
+            keyCredential.IsPrimary = true;
+        }
+
         public void RotateToken()
         {
             var badToken = TokenSet.Find(item => item.IsPrimary);
@@ -115,7 +124,18 @@ namespace JanusKeyManagement
 
         public async Task RefreshDeadTokens()
         {
-            var badTokens = TokenSet.Where(item => item.IsPrimary);
+            var badTokens = TokenSet.Where(item => item.DeadToken);
+            foreach (var badToken in badTokens)
+            {
+                var secretBundle = await FetchKeyVault(badToken.Identifier);
+                badToken.Token = secretBundle.Value;
+                badToken.DeadToken = false;
+            }
+        }
+
+        public async Task RefreshDeadCredentials()
+        {
+            var badTokens = CredentialSet.Where(item => item.DeadToken);
             foreach (var badToken in badTokens)
             {
                 var secretBundle = await FetchKeyVault(badToken.Identifier);
