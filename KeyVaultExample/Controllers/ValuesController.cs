@@ -38,7 +38,7 @@ namespace KeyVaultExample.Controllers
         [HttpGet("Send")]
         public async Task Send()
         {
-            await _serviceBus.SendObject(DateTime.Now.ToLongTimeString() + "Got Here!");
+            await _serviceBus.SendString(DateTime.Now.ToLongTimeString() + "Got Here!");
         }
     }
 }

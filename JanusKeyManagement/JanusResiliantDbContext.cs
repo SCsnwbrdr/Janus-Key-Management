@@ -7,25 +7,25 @@ using System.Text;
 
 namespace JanusKeyManagement
 {
-    public class JanusResiliantDbContext<T> where T: DbContext, new()
+    public class JanusResiliantDbContext<T> : IJanusResiliantDbContext<T> where T: DbContext
     {
         private IDesignTimeDbContextFactory<T> _contextFactory;
-        private IJanusKeyEngine _keyEngine;
+        private IJanusKeySet _keySet;
         private T _activeContext;
         public DbContext ActiveContext { get
             {
                 if(_activeContext != null)
                     return _activeContext;
 
-                string[] args = new string[] { _keyEngine.ActiveCredential.Identifier, _keyEngine.ActiveCredential.Token };
+                string[] args = new string[] { _keySet.Active.Identifier, _keySet.Active.Token };
                 _activeContext = _contextFactory.CreateDbContext(args);
                 return _activeContext;
             } }
         
-        public JanusResiliantDbContext(IDesignTimeDbContextFactory<T> DbContextFactory, IJanusKeyEngine keyEngine)
+        public JanusResiliantDbContext(IDesignTimeDbContextFactory<T> DbContextFactory, IJanusKeySet keyEngine)
         {
             _contextFactory = DbContextFactory;
-            _keyEngine = keyEngine;
+            _keySet = keyEngine;
         }
 
         public EntityEntry Add(object entity)
@@ -77,11 +77,11 @@ namespace JanusKeyManagement
             }
             catch (DbUpdateException exp)
             {
-                _keyEngine.RotateCredential();
-                string[] args = new string[] { _keyEngine.ActiveCredential.Identifier, _keyEngine.ActiveCredential.Token };
+                _keySet.Rotate();
+                string[] args = new string[] { _keySet.Active.Identifier, _keySet.Active.Token };
                 _activeContext = _contextFactory.CreateDbContext(args);
                 result = GenericRetry(retryMethod);
-                _keyEngine.RefreshDeadCredentials();
+                _keySet.Refresh();
             }
             return result;
         }
@@ -95,11 +95,11 @@ namespace JanusKeyManagement
             }
             catch(DbUpdateException exp)
             {
-                _keyEngine.RotateCredential();
-                string[] args = new string[] { _keyEngine.ActiveCredential.Identifier, _keyEngine.ActiveCredential.Token };
+                _keySet.Rotate();
+                string[] args = new string[] { _keySet.Active.Identifier, _keySet.Active.Token };
                 _activeContext = _contextFactory.CreateDbContext(args);
                 result = GenericRetry(retryMethod, parameter);
-                _keyEngine.RefreshDeadCredentials();
+                _keySet.Refresh();
             }
             return result;
         }

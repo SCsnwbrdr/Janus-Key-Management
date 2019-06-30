@@ -3,6 +3,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using JanusKeyManagement;
+using Microsoft.ApplicationInsights;
 using Microsoft.Azure.ServiceBus;
 
 namespace KeyVaultExample.Service
@@ -10,23 +11,26 @@ namespace KeyVaultExample.Service
     public class AzureServiceBusService : IDisposable, IAzureServiceBusService
     {
         private readonly MemoryService _memoryService;
-        private readonly IJanusKeyEngine _janusKeyEngine;
+        private readonly IJanusKeySet _janusKeyEngine;
         const string ServiceBusConnectionStringFormat = "Endpoint={0};SharedAccessKeyName={1};SharedAccessKey={2}";
         private readonly string _endpoint;
         private readonly string _sharedAccessKeyName;
         private readonly string _queueName;
         private QueueClient sendQueueClient;
         private QueueClient receiveQueueClient;
+        private TelemetryClient _applicationInsights;
 
-        public AzureServiceBusService(MemoryService memory, string endpoint, string queueName, string queueAccessKeyName, IJanusKeyEngine janusKeyEngine)
+        public AzureServiceBusService(MemoryService memory, string endpoint, string queueName, string queueAccessKeyName, IJanusKeySet janusKeyEngine)
         {
             _memoryService = memory;
             _endpoint = endpoint;
             _sharedAccessKeyName = queueAccessKeyName;
             _queueName = queueName;
             _janusKeyEngine = janusKeyEngine;
-            sendQueueClient = RegenerateConnection();
+            
             receiveQueueClient = RegenerateConnection();
+
+            _applicationInsights = new TelemetryClient();
         }
 
         private QueueClient RegenerateConnection()
@@ -38,16 +42,19 @@ namespace KeyVaultExample.Service
         {
             try
             {
+                sendQueueClient = RegenerateConnection();
                 var message = new Message(Encoding.UTF8.GetBytes(rawMessage));
                 await sendQueueClient.SendAsync(message);
+                await sendQueueClient.CloseAsync();
             }
             catch (UnauthorizedException)
             {
+                _applicationInsights.TrackTrace("Rotating Key");
                 await sendQueueClient.CloseAsync();
-                _janusKeyEngine.RotateToken();
+                _janusKeyEngine.Rotate();
                 sendQueueClient = RegenerateConnection();
                 await SendString(rawMessage);
-                await _janusKeyEngine.RefreshDeadTokens();
+                await _janusKeyEngine.Refresh();
             }
         }
 
@@ -84,12 +91,25 @@ namespace KeyVaultExample.Service
 
         private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs arg)
         {
-            throw new NotImplementedException();
+            if(arg.Exception.Message.Contains("401"))
+            {
+                receiveQueueClient.CloseAsync();
+                _janusKeyEngine.Rotate();
+                receiveQueueClient = RegenerateConnection();
+                GetMessages();
+                _janusKeyEngine.Refresh();
+            }
+            else
+            {
+                receiveQueueClient.CloseAsync();
+                throw arg.Exception;
+            }
+            return Task.CompletedTask;
         }
 
         private string ServiceBusConnectionString()
         {
-            return string.Format(ServiceBusConnectionStringFormat, _endpoint, _sharedAccessKeyName, _janusKeyEngine.ActiveToken.Token);
+            return string.Format(ServiceBusConnectionStringFormat, _endpoint, _sharedAccessKeyName, _janusKeyEngine.Active.Token);
         }
 
         public void Dispose()

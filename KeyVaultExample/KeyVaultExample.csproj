@@ -11,9 +11,11 @@
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\KeyVaultExample.Model\KeyVaultExample.Repository.csproj" />
     <ProjectReference Include="..\KeyVaultExample.Service\KeyVaultExample.Service.csproj" />
   </ItemGroup>
 

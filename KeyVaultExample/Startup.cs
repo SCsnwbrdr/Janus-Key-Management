@@ -1,8 +1,11 @@
 ﻿using JanusKeyManagement;
+using KeyVaultExample.Repository;
 using KeyVaultExample.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -25,13 +28,15 @@ namespace KeyVaultExample
             IServiceProvider provider = services.BuildServiceProvider();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-           var janusConfigSection = Configuration.GetSection("JanusKeyEngine:Tokens").Get<Dictionary<string, string[]>>();
-            var janusCredConfigSection = Configuration.GetSection("JanusKeyEngine:Credentials").Get<Dictionary<string, JanusCredentials[]>>();
+            var janusConfigSection = Configuration.GetSection("AzureMessageQueue:Keys").Get<string[]>();
+            var userKeys = Configuration.GetSection("Database:UsersAndKeys").Get<Dictionary<string,string>>();
             services.AddSingleton<MemoryService>();
-            services.AddSingleton<IJanusKeyEngine>(new JanusAzureKeyEngine(janusConfigSection,janusCredConfigSection));
+            services.AddScoped<IDesignTimeDbContextFactory<EmployeeContext>>(sp=> new EmployeeDbContextFactory(Configuration.GetValue<string>("Database:Server"),
+                Configuration.GetValue<string>("Database:DatabaseName")));
+            services.AddScoped<EmployeeResiliantDbContext<EmployeeContext>>(sp=> new EmployeeResiliantDbContext<EmployeeContext>(sp.GetService<IDesignTimeDbContextFactory<EmployeeContext>>(), new JanusKeySet(userKeys)));
             services.AddSingleton<IAzureServiceBusService>(sp => new AzureServiceBusService(sp.GetService<MemoryService>(), Configuration.GetValue<string>("AzureMessageQueue:KeyVault:EndPoint"),
                 Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueName"),
-                Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueAccessKeyName"), sp.GetService<IJanusKeyEngine>()));
+                Configuration.GetValue<string>("AzureMessageQueue:KeyVault:QueueAccessKeyName"), new JanusKeySet(janusConfigSection)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

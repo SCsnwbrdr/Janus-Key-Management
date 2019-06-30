@@ -12,3 +12,5 @@
 /JanusKeyManagement/obj
 /KeyVaultExample.Model/obj
 /KeyVaultExample.UOW/obj
+/KeyVaultExample/appsettings.Development-NoSync.json
+/KeyVaultExample.Model/bin

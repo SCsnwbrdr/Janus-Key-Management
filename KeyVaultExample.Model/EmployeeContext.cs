@@ -7,11 +7,11 @@ using System.Text;
 
 namespace KeyVaultExample.Repository
 {
-    public class ExampleContext : DbContext
+    public class EmployeeContext : DbContext
     {
         DbSet<Employee> Employees { get; set; }
 
-        public ExampleContext(DbContextOptions options) : base(options)
+        public EmployeeContext(DbContextOptions options) : base(options)
         {
         }
     }

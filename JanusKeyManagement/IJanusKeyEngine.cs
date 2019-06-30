@@ -3,15 +3,10 @@ using System.Threading.Tasks;
 
 namespace JanusKeyManagement
 {
-    public interface IJanusKeyEngine
+    public interface IJanusKeySet
     {
-        KeyToken ActiveToken { get; }
-        KeyToken ActiveCredential { get; }
-
-        Task RefreshDeadTokens();
-
-        Task RefreshDeadCredentials();
-        void RotateToken();
-        void RotateCredential();
+        KeyToken Active { get; }
+        Task Refresh();
+        void Rotate();
     }
 }
